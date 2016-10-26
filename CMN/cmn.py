@@ -12,8 +12,13 @@ class CMN():
 			self.ME_commonness = ME_commonness
 
 	def getEntityRank(self, mention_set):
-		max_mention_len = max(len(mention.split()) for mention, entity in mention_set) if len(mention_set)>0 else 0
-		max_mention_list = [(mention, entity) for mention, entity in mention_set if len(mention.split())==max_mention_len]
+		max_mention_len = {}
+		for mention, entity in mention_set:
+			if entity not in max_mention_len:
+				max_mention_len[entity] = 0
+			if len(mention.split())>max_mention_len[entity]:
+				max_mention_len[entity] = len(mention.split())
+		max_mention_list = [(mention, entity) for mention, entity in mention_set if len(mention.split())==max_mention_len[entity]]
 		entity_score = {}
 
 		for mention, entity in max_mention_list:
