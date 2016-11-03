@@ -1,10 +1,9 @@
+import sys
+sys.path.append("../")
 import utils
 
 def write_cmns():
 	out = file("resource/cmns", "w")
-	#YERD = utils.parseYERD()
-	#ClueWeb = utils.parseClueWeb()
-
 	ME_commonness = utils.cal_ME_cmns()
 
 	for mention in ME_commonness:

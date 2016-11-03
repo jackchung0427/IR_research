@@ -26,7 +26,7 @@ def loadKbSurfaceForm():
 		sf_entity[entity] = mention
 	return sf_entity
 
-def load_ME_cmns():
+def load_ME_cmns(isRestricted=True):
 	filepath = "/Users/cyc520427/git/CMU/IR_research/resource/cmns"
 	(wiki_map, freebase_map) = loadWikiFreeMap()
 	kb_sf = loadKbSurfaceForm()
@@ -39,7 +39,7 @@ def load_ME_cmns():
 		score = float(line[2])
 
 		#exclude not in wiki & kb
-		if entity not in freebase_map or entity not in kb_sf:
+		if isRestricted and (entity not in freebase_map or entity not in kb_sf):
 			continue
 		if mention not in ME_commonness:
 			ME_commonness[mention] = {}
@@ -97,7 +97,7 @@ def loadValidFreeEntity(filepath):
 		valid_mention.add(name.lower())
 	return (valid_entity, valid_mention)
 
-def parseClueWeb(ground_truth_path=None):
+def parseClueWeb(isRestricted=True, ground_truth_path=None):
 	filepath = "/Users/cyc520427/git/CMU/IR_research/resource/ManualCandidate"
 	ClueWeb = {}
 	IF = {}
@@ -112,7 +112,7 @@ def parseClueWeb(ground_truth_path=None):
 		if qid not in ClueWeb:
 			ClueWeb[qid] = query
 			IF[qid] = []
-		if entity in freebase_map and entity in kb_sf:
+		if not isRestricted or (entity in freebase_map and entity in kb_sf):
 			IF[qid].append(entity)
 
 	if ground_truth_path!=None:
@@ -185,6 +185,36 @@ def load_IF(filepath):
 		qid = line[0]
 		if qid not in IF:
 			IF[qid] = []
-		IF[qid].append(line[2:])
+		IF[qid].append(set(line[2:]))
 	return IF
+
+def get_top_wiki(dataset, qid, top):
+	query_rank_path = "query_rank/"+dataset+"_"+qid
+	top_wiki = []
+
+	for line in open(query_rank_path):
+		line = line.strip()
+		if line=="None":
+			continue
+		top_wiki.append(line)
+		top -= 1
+		if top<=0:
+			break
+	return top_wiki
+
+def check_entity_facc1(qid, top, entity, dataset):
+	filepath = "resource/wiki_facc1_100"
+
+	top_wiki = get_top_wiki(dataset, qid, top)
+	for line in open(filepath):
+		line = line.strip().split("\t")
+		if len(line)<2:
+			continue
+		if line[0] in top_wiki:
+			facc1 = line[1].split()
+			if len(facc1)==0:
+				continue
+			if entity in facc1:
+				return True
+	return False
 
