@@ -26,10 +26,9 @@ def exec_wiki_q(dataset, threshold):
 			MD_f.write(qid+"\t"+entity+"\t"+mention+"\t"+str(ME_commonness[mention][entity])+"\n")
 	MD_f.close()
 
-def exec_original_q(dataset, threshold):
-	ME_commonness = utils.load_ME_cmns()
-	YERD = utils.parseYERD()
-	ClueWeb = utils.parseClueWeb()
+def exec_original_q(dataset, threshold, isRestricted):
+	ME_commonness = utils.load_ME_cmns(isRestricted)
+	Q = utils.parseYERD() if dataset=="YERD" else utils.parseClueWeb()
 
 	MD_out = "MD_"+dataset+"_"+str(threshold)
 	SM_out = "SM_"+dataset+"_"+str(threshold)
@@ -37,8 +36,7 @@ def exec_original_q(dataset, threshold):
 	SM_f = open(SM_out, "w")
 	SM_f.write("qid\tfreebase_id\tmention\tscore\n")
 
-	for qid, query in YERD.items():
-	#for qid, query in ClueWeb.items():
+	for qid, query in Q.items():
 		print qid
 		common = cmn.CMN(query, threshold, ME_commonness)
 		mention_set = common.getMentions()
@@ -53,9 +51,11 @@ def exec_original_q(dataset, threshold):
 	MD_f.close()
 	SM_f.close()
 
-dataset = "YERD"
-#dataset = "ClueWeb"
+#dataset = "YERD"
+dataset = "ClueWeb"
+isRestricted = True
 
 threshold = 0.5
-exec_original_q(dataset, threshold)
+exec_original_q(dataset, threshold, isRestricted)
 #exec_wiki_q(dataset, threshold)
+
