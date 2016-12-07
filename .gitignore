@@ -1,1 +1,7 @@
 *.pyc
+CMN/res_*
+TagMe/res_*
+EntityLinkingInQueries-ELQ/
+resource/
+query_rank/
+supervised/
